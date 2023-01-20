@@ -1,0 +1,92 @@
+package shop.domain
+
+import derevo.circe.magnolia._
+import derevo.derive
+import derevo.cats._
+import eu.timepit.refined.api.Refined
+import eu.timepit.refined.string.{Uuid, ValidBigDecimal}
+import eu.timepit.refined.types.string.NonEmptyString
+import io.estatico.newtype.macros.newtype
+import shop.domain.brand._
+import shop.domain.category._
+import squants.market._
+import eu.timepit.refined.auto._
+import shop.domain.cart.{CartItem, Quantity}
+import shop.optics.uuid
+
+import java.util.UUID
+
+object items {
+
+  @derive(decoder, encoder, keyDecoder, keyEncoder, eqv, show, uuid)
+  @newtype case class ItemId(value: UUID)
+
+  @newtype case class ItemName(value: String)
+
+  @newtype case class ItemDescription(value: String)
+
+  case class Item(
+      uuid: ItemId,
+      name: ItemName,
+      description: ItemDescription,
+      price: Money,
+      brand: Brand,
+      category: Category
+  ) {
+    def cart(q: Quantity): CartItem =
+      CartItem(this, q)
+  }
+  case class CreateItem(
+      name: ItemName,
+      description: ItemDescription,
+      price: Money,
+      brandId: BrandId,
+      categoryId: CategoryId
+  )
+
+  case class UpdateItem(
+      id: ItemId,
+      price: Money
+  )
+
+  // CreateItem
+
+  @newtype
+  case class ItemNameParam(value: NonEmptyString)
+  @newtype
+  case class ItemDescriptionParam(value: NonEmptyString)
+  @newtype
+  case class PriceParam(value: String Refined ValidBigDecimal)
+
+  case class CreatedItemParam(
+      name: ItemNameParam,
+      description: ItemDescriptionParam,
+      price: PriceParam,
+      brandId: BrandId,
+      categoryId: CategoryId
+  ) {
+    def toDomain: CreateItem =
+      CreateItem(
+        ItemName(name.value),
+        ItemDescription(description.value),
+        USD(BigDecimal(price.value)),
+        brandId,
+        categoryId
+      )
+  }
+
+  // Update Item
+
+  @newtype case class ItemIdParam(value: String Refined Uuid)
+
+  case class UpdateItemParam(
+      id: ItemIdParam,
+      price: PriceParam
+  ) {
+    def toDomain: UpdateItem =
+      UpdateItem(
+        ItemId(UUID.fromString(id.value)),
+        USD(BigDecimal(price.value))
+      )
+  }
+}

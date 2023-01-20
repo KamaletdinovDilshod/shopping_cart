@@ -1,0 +1,5 @@
+package shop
+
+object Main {
+
+}
