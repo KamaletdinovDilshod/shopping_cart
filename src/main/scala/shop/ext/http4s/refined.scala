@@ -17,15 +17,12 @@ object refined {
     QueryParamDecoder[T].emap(refineV[P](_).leftMap(m => ParseFailure(m, m)))
 
   implicit class RefinedRequestDecoder[F[_]: JsonDecoder: MonadThrow](req: Request[F]) extends Http4sDsl[F] {
-    def decodeR[A: Decoder](
-        f: A => F[Response[F]]
-    ): F[Response[F]] =
+    def decodeR[A: Decoder](f: A => F[Response[F]]): F[Response[F]] =
       req.asJsonDecode[A].attempt.flatMap {
         case Left(e) =>
           Option(e.getCause) match {
             case Some(c) if c.getMessage.startsWith("Predicate") =>
               BadRequest(c.getMessage)
-
             case _ =>
               UnprocessableEntity()
           }

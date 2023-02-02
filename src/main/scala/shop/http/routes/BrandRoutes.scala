@@ -1,13 +1,14 @@
 package shop.http.routes
 
 import cats.Monad
+import io.circe.generic.auto.exportEncoder
 import org.http4s.HttpRoutes
+import org.http4s.circe.CirceEntityCodec.circeEntityEncoder
 import org.http4s.dsl.Http4sDsl
 import org.http4s.server.Router
 import shop.services.Brands
-import org.http4s.circe.CirceEntityEncoder._
 
-final case class BrandRoutes[F[_]: Monad]()(brands: Brands[F]) extends Http4sDsl[F] {
+final case class BrandRoutes[F[_]: Monad](brands: Brands[F]) extends Http4sDsl[F] {
 
   private[routes] val prefixPath = "/brands"
 

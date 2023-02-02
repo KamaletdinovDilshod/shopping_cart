@@ -1,18 +1,20 @@
 package shop.services
 
-import shop.auth._
+import shop.auth.{Crypto, Tokens}
 import shop.config.types.TokenExpiration
-import shop.domain._
 import shop.domain.auth._
 import shop.http.authentication.users._
-import shop.http.authentication
+import shop.domain.domain.tokenEq
+import shop.domain.domain.tokenShow
+
 import cats._
-import cats.implicits._
+import cats.syntax.all._
+import dev.profunktor.auth.jwt.JwtToken
 import dev.profunktor.redis4cats.RedisCommands
 import io.circe.parser.decode
 import io.circe.syntax._
 import pdi.jwt.JwtClaim
-import shop.domain.auth.JwtToken
+
 trait Auth[F[_]] {
   def newUser(username: UserName, password: Password): F[JwtToken]
   def login(username: UserName, password: Password): F[JwtToken]
@@ -50,7 +52,7 @@ object Auth {
     def login(username: UserName, password: Password): F[JwtToken] =
       users.find(username).flatMap {
         case None => UserNotFound(username).raiseError[F, JwtToken]
-        case Some(user) if user.password =!= crypto.encrypt(password) =>
+        case Some(user) if user.password != crypto.encrypt(password) =>
           InvalidPassword(user.name).raiseError[F, JwtToken]
         case Some(user) =>
           redis.get(username.show).flatMap {
@@ -63,8 +65,9 @@ object Auth {
           }
       }
 
-    override def logout(token: JwtToken, username: UserName): F[Unit] =
+    def logout(token: JwtToken, username: UserName): F[Unit] =
       redis.del(token.show) *> redis.del(username.show).void
+
   }
 }
 object UsersAuth {

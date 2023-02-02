@@ -84,6 +84,7 @@ private object ItemSQL {
          FROM items AS i
          INNER JOIN brands AS b ON i.brand_id = b.uuid
          INNER JOIN categories AS c ON i.category_id = c.uuid
+         WHERE b.name LIKE $brandName
        """.query(decoder)
 
   val selectById: Query[ItemId, Item] =

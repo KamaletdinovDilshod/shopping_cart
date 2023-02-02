@@ -8,7 +8,7 @@ import org.http4s.server.Router
 import shop.services.Categories
 import org.http4s.circe.CirceEntityEncoder._
 
-final case class CategoryRoutes[F[_]: Monad]()(categories: Categories[F]) extends Http4sDsl[F] {
+final case class CategoryRoutes[F[_]: Monad](categories: Categories[F]) extends Http4sDsl[F] {
 
   private[routes] val prefixPath = "/categories"
 

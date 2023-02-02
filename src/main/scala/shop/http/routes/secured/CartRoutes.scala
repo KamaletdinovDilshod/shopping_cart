@@ -1,7 +1,7 @@
 package shop.http.routes.secured
 
 import cats.Monad
-import io.circe.generic.auto.exportDecoder
+import io.circe.generic.auto.{exportDecoder, exportEncoder}
 import org.http4s.{AuthedRoutes, HttpRoutes}
 import org.http4s.dsl.Http4sDsl
 import shop.services.ShoppingCart
@@ -53,6 +53,4 @@ case class CartRoutes[F[_]: JsonDecoder: Monad](shoppingCart: ShoppingCart[F]) e
             ): HttpRoutes[F] = Router(
     prefixPath -> authMiddleware(httpRoutes)
   )
-
-
 }

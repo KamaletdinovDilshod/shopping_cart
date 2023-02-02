@@ -1,7 +1,7 @@
 package shop.http.routes.admin
 
 import shop.http.authentication.users.AdminUser
-import shop.services.{Brands, Categories}
+import shop.services. Categories
 import shop.ext.http4s.refined.RefinedRequestDecoder
 import shop.domain.category._
 import cats.MonadThrow

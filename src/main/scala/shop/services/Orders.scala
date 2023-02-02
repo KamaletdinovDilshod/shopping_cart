@@ -79,7 +79,7 @@ private object OrderSQL {
   val encoder: Encoder[UserId ~ Order] =
     (orderId ~ userId ~ paymentId ~ jsonb[Map[ItemId, Quantity]] ~ money).contramap {
       case id ~ o =>
-        o.id ~ id ~ o.paymentId ~ o.items ~ o.total
+        o.id ~ id ~ o.pid ~ o.items ~ o.total
     }
 
   val selectByUserId: Query[UserId, Order] =

@@ -17,6 +17,8 @@ trait OrphanInstances {
 
   implicit val moneyEq: Eq[Money] = Eq.and(Eq.by(_.amount), Eq.by(_.currency))
 
+  implicit val moneyShow: Show[Money] = Show.fromToString
+
   implicit val tokenEq: Eq[JwtToken] = Eq.by(_.value)
 
   implicit val tokenShow: Show[JwtToken] = Show[String].contramap[JwtToken](_.value)

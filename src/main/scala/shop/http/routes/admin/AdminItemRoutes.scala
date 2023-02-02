@@ -24,7 +24,7 @@ final case class AdminItemRoutes[F[_]: JsonDecoder: MonadThrow](
     AuthedRoutes.of {
       //Create new item
       case ar @ POST -> Root as _ =>
-        ar.req.decodeR[CreatedItemParam] { item =>
+        ar.req.decodeR[CreateItemParam] { item =>
           items.create(item.toDomain).flatMap { id =>
             Created(JsonObject.singleton("item_id", id.asJson))
           }

@@ -1,6 +1,6 @@
 package shop.programs
 
-import shop.domain.cart.{CartItem, CartTotal}
+import shop.domain.cart.{ CartItem, CartTotal }
 import shop.domain.auth.UserId
 import shop.domain.order._
 import shop.domain.payment.Payment
@@ -43,22 +43,21 @@ final case class Checkout[F[_]: Background: Logger: MonadThrow: Retry](
         case e => OrderError(e.getMessage)
       }
 
-    def bgAction(fa: F[OrderId]): F[OrderId] = {
+    def bgAction(fa: F[OrderId]): F[OrderId] =
       fa.onError {
         case _ =>
           Logger[F].error(
-            s"Failed to create order for: ${paymentId.show}"
+            s"Failed to create order for Payment: ${paymentId.show}. Rescheduling as a background action"
           ) *>
             Background[F].schedule(bgAction(fa), 1.hour)
       }
-      bgAction(action)
-    }
+    bgAction(action)
   }
 
   def ensureNonEmpty[A](xs: List[A]): F[NonEmptyList[A]] =
     MonadThrow[F].fromOption(NonEmptyList.fromList(xs), EmptyCartError)
 
-  def process(userId: UserId, card: Card): F[OrderId] = {
+  def process(userId: UserId, card: Card): F[OrderId] =
     cart.get(userId).flatMap {
       case CartTotal(items, total) =>
         for {
@@ -68,5 +67,4 @@ final case class Checkout[F[_]: Background: Logger: MonadThrow: Retry](
           _   <- cart.delete(userId).attempt.void
         } yield oid
     }
-  }
 }

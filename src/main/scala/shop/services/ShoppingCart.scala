@@ -9,6 +9,7 @@ import shop.effects._
 import cats.MonadThrow
 import cats.syntax.all._
 import dev.profunktor.redis4cats.RedisCommands
+import shop.domain.domain.moneyMonoid
 
 trait ShoppingCart[F[_]] {
   def add(

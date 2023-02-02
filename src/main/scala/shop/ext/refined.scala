@@ -1,7 +1,9 @@
 package shop.ext
 
-import eu.timepit.refined.api.Validate
+import eu.timepit.refined.api.{ Refined, Validate }
 import eu.timepit.refined.collection.Size
+import eu.timepit.refined.refineV
+import io.circe.Decoder
 
 object refined {
 
@@ -14,4 +16,5 @@ object refined {
       Size[N](w.value)
     )
 
+  def decoderOf[T, P](implicit v: Validate[T, P], d: Decoder[T]): Decoder[T Refined P] = d.emap(refineV[P].apply[T](_))
 }

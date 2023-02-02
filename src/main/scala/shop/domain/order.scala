@@ -8,6 +8,7 @@ import shop.domain.cart.Quantity
 import shop.domain.items.ItemId
 import shop.optics.uuid
 import squants.market.Money
+import shop.domain.domain._
 
 import java.util.UUID
 import scala.util.control.NoStackTrace
@@ -20,6 +21,7 @@ object order {
   @derive(decoder, encoder, eqv, show, uuid)
   @newtype case class PaymentId(value: UUID)
 
+  @derive(decoder, encoder, eqv, show)
   case class Order(
       id: OrderId,
       pid: PaymentId,
