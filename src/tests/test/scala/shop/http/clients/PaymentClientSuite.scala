@@ -1,18 +1,18 @@
 package shop.http.clients
 
+import shop.config.types.{ PaymentConfig, PaymentURI }
+import shop.domain.order.PaymentError
+import shop.generators._
+
 import cats.effect.IO
-import org.http4s.Method.POST
-import org.http4s.Status.{Conflict, Ok}
-import org.http4s.{HttpRoutes, Response}
-import shapeless.ops.zipper.Root
+import eu.timepit.refined.auto._
+import org.http4s.circe.CirceEntityEncoder._
+import org.http4s.client.Client
+import org.http4s.dsl.io._
+import org.http4s.implicits._
+import org.http4s.{ HttpRoutes, Response }
 import weaver.SimpleIOSuite
 import weaver.scalacheck.Checkers
-import org.http4s.client.Client
-import org.http4s.dsl.io.InternalServerError
-import shop.config.types.{PaymentConfig, PaymentURI}
-import shop.domain.order.PaymentError
-import shop.generators.{paymentGen, paymentIdGen}
-import eu.timepit.refined.auto._
 object PaymentClientSuite extends SimpleIOSuite with Checkers {
 
   val config = PaymentConfig(PaymentURI("http://localhost:"))
@@ -25,7 +25,7 @@ object PaymentClientSuite extends SimpleIOSuite with Checkers {
       .orNotFound
 
   val gen = for {
-    i <- paymentGen
+    i <- paymentIdGen
     p <- paymentGen
   } yield i -> p
 

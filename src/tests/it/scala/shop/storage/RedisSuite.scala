@@ -1,10 +1,13 @@
 package shop.storage
 
 import java.util.UUID
+
 import scala.concurrent.duration._
+
 import shop.auth._
 import shop.config.types._
 import shop.domain.ID
+import shop.domain.auth._
 import shop.domain.brand._
 import shop.domain.cart._
 import shop.domain.category._
@@ -12,22 +15,18 @@ import shop.domain.items._
 import shop.generators._
 import shop.http.authentication.users._
 import shop.services._
+
 import cats.effect._
 import cats.effect.kernel.Ref
 import cats.implicits._
 import dev.profunktor.auth.jwt._
 import dev.profunktor.redis4cats.log4cats._
-import dev.profunktor.redis4cats.{Redis, RedisCommands}
+import dev.profunktor.redis4cats.{ Redis, RedisCommands }
 import eu.timepit.refined.auto._
 import eu.timepit.refined.cats._
 import org.typelevel.log4cats.noop.NoOpLogger
 import pdi.jwt._
-import shop.domain.auth.{EncryptedPassword, UserId, UserName}
 import shop.suite.ResourceSuite
-import scala.collection.IterableOps
-import org.specs2.matcher.Matchers.typedEqualExpectation
-
-import scala.tools.nsc.tasty.SafeEq
 object RedisSuite extends ResourceSuite {
 
   implicit val logger = NoOpLogger[IO]
@@ -74,10 +73,10 @@ object RedisSuite extends ResourceSuite {
             v <- c.get(uid)
           } yield expect.all(
             x.items.isEmpty,
-            y.items.size === 2,
-            z.items.size === 1,
+            y.items.size == 2,
+            z.items.size == 1,
             v.items.isEmpty,
-            w.items.headOption.fold(false)(_.quantity === q2)
+            w.items.headOption.fold(false)(_.quantity == q2)
           )
         }
     }
@@ -97,7 +96,7 @@ object RedisSuite extends ResourceSuite {
           c <- Crypto.make[IO](PasswordSalt("test"))
           a = Auth.make(tokenExp, t, new TestUsers(un2), redis, c)
           u = UsersAuth.common[IO](redis)
-          x <- u.findUser(JwtToken("invalid")(jwtClaim))
+          x <- u.findUser(JwtToken("invalid"))(jwtClaim)
           y <- a.login(un1, pw).attempt
           j <- a.newUser(un1, pw)
           e <- jwtDecode[IO](j, userJwtAuth.value).attempt
@@ -109,10 +108,10 @@ object RedisSuite extends ResourceSuite {
           z <- redis.get(j.value)
         } yield expect.all(
           x.isEmpty,
-          y = Left(UserNotFound(un1)),
+          y == Left(UserNotFound(un1)),
           e.isRight,
-          k = Left(InvalidPassword(un2)),
-          w.fold(false)(_.value.name === un1),
+          k == Left(InvalidPassword(un2)),
+          w.fold(false)(_.value.name == un1),
           s.nonEmpty,
           z.isEmpty
         )
@@ -121,22 +120,26 @@ object RedisSuite extends ResourceSuite {
 }
 
 protected class TestItems(ref: Ref[IO, Map[ItemId, Item]]) extends Items[IO] {
-  def findAll: IO[List[Item]]                  = ref.get.map(_.values.toList)
-  def findBy(brand: BrandName): IO[List[Item]] = ref.get.map(_.values.filter(_.brand.name === brand).toList)
-  def create(item: CreateItem): IO[Unit] = ID.make[IO, ItemId].flatMap { id =>
-    val brand    = Brand(item.brandId, BrandName("foo"))
-    val category = Category(item.categoryId, CategoryName("foo"))
-    val newItem  = Item(id, item.name, item.description, item.price, brand, category)
-    ref.update(_.updated(id, newItem))
-  }
-
+  def findAll: IO[List[Item]] =
+    ref.get.map(_.values.toList)
+  def findBy(brand: BrandName): IO[List[Item]] =
+    ref.get.map(_.values.filter(_.brand.name == brand).toList)
+  def findById(itemId: ItemId): IO[Option[Item]] =
+    ref.get.map(_.get(itemId))
+  def create(item: CreateItem): IO[ItemId] =
+    ID.make[IO, ItemId].flatTap { id =>
+      val brand    = Brand(item.brandId, BrandName("foo"))
+      val category = Category(item.categoryId, CategoryName("foo"))
+      val newItem  = Item(id, item.name, item.description, item.price, brand, category)
+      ref.update(_.updated(id, newItem))
+    }
   def update(item: UpdateItem): IO[Unit] =
-    ref.update (x => x.get(item.id).fold(x) (i => x.updated(item.id, i.copy(price = item.price))))
+    ref.update(x => x.get(item.id).fold(x)(i => x.updated(item.id, i.copy(price = item.price))))
 }
 
 protected class TestUsers(un: UserName) extends Users[IO]{
   def find(username: UserName): IO[Option[UserWithPassword]] = IO.pure {
-    (username === un)
+    (username == un)
       .guard[Option]
       .as(UserWithPassword(UserId(UUID.randomUUID), un, EncryptedPassword("foo")))
   }

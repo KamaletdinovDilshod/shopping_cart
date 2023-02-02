@@ -20,10 +20,10 @@ import javax.crypto.Cipher
 
 object auth {
 
-  @derive(decoder, encoder, show)
+  @derive(decoder, encoder, eqv, show)
   @newtype case class UserName(value: String)
 
-  @derive(decoder, encoder)
+  @derive(decoder, encoder, eqv, show)
   @newtype case class Password(value: String)
 
   @derive(decoder, encoder, eqv, show)

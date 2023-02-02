@@ -6,12 +6,11 @@ import cats.effect._
 import cats.implicits._
 import natchez.Trace.Implicits.noop
 import org.scalacheck.Gen
-import cats.implicits._
 import skunk._
 import skunk.implicits._
-
 import shop.domain.brand.BrandId
 import shop.domain.category.CategoryId
+import shop.domain.domain.moneyShow
 import shop.domain.items.CreateItem
 import shop.generators._
 import shop.services._

@@ -1,6 +1,7 @@
 package shop.domain
 
-import derevo.circe.magnolia.encoder
+import derevo.cats.{eqv, show}
+import derevo.circe.magnolia.{decoder, encoder}
 import derevo.derive
 import io.circe.Encoder
 import io.estatico.newtype.macros.newtype
@@ -20,6 +21,7 @@ object healthcheck {
       postgres: PostgresStatus
   )
 
+  @derive(eqv)
   sealed trait Status
 
   object Status {

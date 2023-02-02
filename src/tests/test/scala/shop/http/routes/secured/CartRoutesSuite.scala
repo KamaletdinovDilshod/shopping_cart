@@ -1,21 +1,21 @@
 package shop.http.routes.secured
 
-import shop.http.authentication.users.CommonUser
-import shop.services._
-import shop.domain.cart.{ Cart, CartTotal, Quantity }
-import shop.domain.items.ItemId
-import squants.market.USD
-import shop.generators.{ cartGen, cartTotalGen, commonUserGen }
-import shop.domain.auth.UserId
+import shop.domain.auth._
+import shop.domain.cart._
+import shop.domain.items._
+import shop.generators._
+import shop.http.authentication.users._
+import shop.services.ShoppingCart
+
 import cats.data.Kleisli
 import cats.effect._
-import io.circe.generic.auto.exportEncoder
 import org.http4s.Method._
 import org.http4s._
 import org.http4s.circe.CirceEntityEncoder._
 import org.http4s.client.dsl.io._
 import org.http4s.server.AuthMiddleware
 import org.http4s.syntax.literals._
+import squants.market.USD
 import shop.suite.HttpSuite
 
 object CartRoutesSuite extends HttpSuite {
@@ -48,11 +48,8 @@ object CartRoutesSuite extends HttpSuite {
     forall(gen) {
       case (user, c) =>
         val req = POST(c, uri"/cart")
-        val routes = {
-          CartRoutes[IO](new TestShoppingCart)
-            .routes(authMiddleware(user))
-          expectHttpStatus(routes, req)(Status.Created)
-        }
+        val routes = CartRoutes[IO](new TestShoppingCart).routes(authMiddleware(user))
+        expectHttpStatus(routes, req)(Status.Created)
     }
   }
 }

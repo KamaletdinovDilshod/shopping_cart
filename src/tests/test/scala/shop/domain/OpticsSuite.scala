@@ -2,7 +2,7 @@ package shop.domain
 
 import org.scalacheck.{Arbitrary, Cogen, Gen}
 import shop.domain.brand.BrandId
-import shop.generators.brandIdGen
+import shop.generators.{brandIdGen, categoryIdGen}
 import weaver.FunSuite
 import weaver.discipline.Discipline
 import shop.domain.healthcheck.Status
@@ -29,11 +29,8 @@ object OpticsSuite extends FunSuite with Discipline {
   implicit val brandIdCogen: Cogen[BrandId] =
     Cogen[UUID].contramap[BrandId](_.value)
 
-  implicit val brandIdCogen: Cogen[BrandId] =
-    Cogen[UUID].contramap[BrandId](_.value)
-
   implicit val catIdArb: Arbitrary[CategoryId] =
-    Arbitrary(categoryId)
+    Arbitrary(categoryIdGen)
 
   implicit val catIdCogen: Cogen[CategoryId] =
     Cogen[UUID].contramap[CategoryId](_.value)

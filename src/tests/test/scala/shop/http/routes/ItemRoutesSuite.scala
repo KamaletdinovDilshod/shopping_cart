@@ -4,15 +4,12 @@ import org.scalacheck.Gen
 import shop.generators.{brandGen, itemGen}
 import cats.effect._
 import cats.syntax.all._
-import io.circe.generic.auto.exportEncoder
 import org.http4s.Method._
 import org.http4s._
 import org.http4s.client.dsl.io._
 import org.http4s.syntax.literals._
-import org.scalacheck.Gen
 import shop.domain.brand.BrandName
 import shop.domain.items.{CreateItem, Item, ItemId, UpdateItem}
-import shop.programs.CheckoutSuite
 import shop.programs.CheckoutSuite.F
 import shop.services.Items
 import shop.suite.HttpSuite
