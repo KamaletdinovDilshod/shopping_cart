@@ -2,12 +2,12 @@ package shop.ext.http4s
 
 import cats.MonadThrow
 import cats.implicits._
-import eu.timepit.refined.api.{Refined, Validate}
+import eu.timepit.refined.api.{ Refined, Validate }
 import eu.timepit.refined.refineV
 import io.circe.Decoder
-import org.http4s.circe.{JsonDecoder, toMessageSyntax}
+import org.http4s.circe.{ JsonDecoder, toMessageSyntax }
 import org.http4s.dsl.Http4sDsl
-import org.http4s.{ParseFailure, QueryParamDecoder, Request, Response}
+import org.http4s.{ ParseFailure, QueryParamDecoder, Request, Response }
 
 object refined {
 
@@ -21,10 +21,9 @@ object refined {
       req.asJsonDecode[A].attempt.flatMap {
         case Left(e) =>
           Option(e.getCause) match {
-            case Some(c) if c.getMessage.startsWith("Predicate") =>
-              BadRequest(c.getMessage)
-            case _ =>
-              UnprocessableEntity()
+            case Some(c) if c.getMessage.startsWith("Predicate") => BadRequest(c.getMessage)
+            case Some(e)                                         => UnprocessableEntity(e.getMessage)
+            case None                                            => UnprocessableEntity("Unknown error")
           }
         case Right(a) => f(a)
       }

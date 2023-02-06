@@ -14,6 +14,7 @@ import shop.domain.domain.moneyShow
 import shop.domain.items.CreateItem
 import shop.generators._
 import shop.services._
+
 object PostgresSuite extends ResourceSuite {
 
   val flushTables: List[Command[Void]] =

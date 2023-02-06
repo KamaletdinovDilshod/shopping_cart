@@ -16,12 +16,13 @@ import io.circe._
 import io.circe.refined._
 import io.estatico.newtype.macros.newtype
 
+
 import javax.crypto.Cipher
 
 object auth {
 
   @derive(decoder, encoder, eqv, show)
-  @newtype case class UserName(value: String)
+  @newtype case class UserName(username: String)
 
   @derive(decoder, encoder, eqv, show)
   @newtype case class Password(value: String)
@@ -61,8 +62,8 @@ object auth {
     implicit val userNameShow: Show[UserNameParam] = Show[String].contramap[UserNameParam](_.value)
   }
 
-  @newtype case class PasswordParam(value: NonEmptyString) {
-    def toDomain: Password = Password(value)
+  @newtype case class PasswordParam(password: NonEmptyString) {
+    def toDomain: Password = Password(password)
   }
 
   object PasswordParam{
@@ -70,11 +71,11 @@ object auth {
       Decoder.forProduct1("password")(PasswordParam.apply)
 
     implicit val decodePasswordParam: Encoder[PasswordParam] =
-      Encoder.forProduct1("password")(_.value)
+      Encoder.forProduct1("password")(_.password)
 
-    implicit val passwordParamEq: Eq[PasswordParam] = Eq.by(_.value)
+    implicit val passwordParamEq: Eq[PasswordParam] = Eq.by(_.password)
 
-    implicit val passwordParam: Show[PasswordParam] = Show[String].contramap[PasswordParam](_.value)
+    implicit val passwordParam: Show[PasswordParam] = Show[String].contramap[PasswordParam](_.password)
   }
 
   @derive(decoder, encoder)

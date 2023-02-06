@@ -7,8 +7,12 @@ val http4Version       = "0.23.1"
 lazy val doobieVersion = "1.0.0-RC1"
 
 lazy val root = (project in file("."))
+  .enablePlugins(AshScriptPlugin)
+
   .settings(
     name := "shopping_cart",
+    dockerBaseImage := "openjdk:11-jre-slim-buster",
+    makeBatScripts := Seq(),
     libraryDependencies ++= Seq(
       compilerPlugin(
         "org.typelevel" %% "kind-projector" % "0.13.2"

@@ -25,6 +25,6 @@ object codecs {
   val paymentId: Codec[PaymentId]           = uuid.imap[PaymentId](v => PaymentId(v))(_.value)
 
   val userId: Codec[UserId]                 = uuid.imap[UserId](v => UserId(v))(_.value)
-  val username: Codec[UserName]             = varchar.imap[UserName](v => UserName(v))(_.value)
+  val username: Codec[UserName]             = varchar.imap[UserName](v => UserName(v))(_.username)
   val encPassword: Codec[EncryptedPassword] = varchar.imap[EncryptedPassword](v => EncryptedPassword(v))(_.value)
 }

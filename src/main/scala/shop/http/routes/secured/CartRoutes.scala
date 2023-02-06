@@ -29,6 +29,7 @@ case class CartRoutes[F[_]: JsonDecoder: Monad](shoppingCart: ShoppingCart[F]) e
           _.items
             .map {
               case (id, quantity) =>
+                println("NotError")
                 shoppingCart.add(user.value.id, id, quantity)
             }
             .toList

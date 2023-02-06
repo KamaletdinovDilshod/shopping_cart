@@ -100,8 +100,7 @@ private object ItemSQL {
   val insertItem: Command[ItemId ~ CreateItem] =
     sql"""
          INSERT INTO items
-         VALUES(
-         $itemId, $itemName, $itemDesc, $money, $brandId, $categoryId
+         VALUES($itemId, $itemName, $itemDesc, $money, $brandId, $categoryId)
        """.command.contramap {
       case id ~ i =>
         id ~ i.name ~ i.description ~ i.price ~ i.brandId ~ i.categoryId

@@ -1,17 +1,16 @@
 package shop.http.routes.auth
 
-import shop.services.Auth
-import shop.ext.http4s.refined._
-import shop.domain.auth._
 import cats.MonadThrow
-import cats.implicits.toShow
+import cats.implicits._
+import io.circe.generic.auto.exportEncoder
 import org.http4s.HttpRoutes
+import org.http4s.circe.CirceEntityCodec.circeEntityEncoder
 import org.http4s.circe.JsonDecoder
 import org.http4s.dsl.Http4sDsl
 import org.http4s.server.Router
-import org.http4s.circe.CirceEntityEncoder._
-import cats.implicits._
-import io.circe.generic.auto.exportEncoder
+import shop.domain.auth.{CreateUser, UserNameInUse}
+import shop.ext.http4s.refined._
+import shop.services.Auth
 
 
 final case class UserRoutes[F[_]: JsonDecoder: MonadThrow](auth: Auth[F]) extends Http4sDsl[F] {
@@ -31,9 +30,13 @@ final case class UserRoutes[F[_]: JsonDecoder: MonadThrow](auth: Auth[F]) extend
           .recoverWith {
             case UserNameInUse(u) =>
               Conflict(u.show)
+            case er => println(s"EEEEEEE: $er")
+              BadRequest("ISHLAMADI")
           }
       }
   }
+
+
   val routes: HttpRoutes[F] = Router(
     prefixPath -> httpRoutes
   )

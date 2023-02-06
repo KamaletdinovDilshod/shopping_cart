@@ -34,7 +34,7 @@ object AppResources {
     ): F[Unit] =
       postgres.use { session =>
         session
-          .unique(sql"selected version();".query(text))
+          .unique(sql"select version();".query(text))
           .flatMap { v =>
             Logger[F].info(s"Connected to Postgres $v")
           }

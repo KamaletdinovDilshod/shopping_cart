@@ -30,9 +30,7 @@ final case class AdminBrandRoutes[F[_]: JsonDecoder: MonadThrow](
         }
     }
   }
-  def routes(
-      authMiddleware: AuthMiddleware[F, AdminUser]
-  ): HttpRoutes[F] = Router(
+  def routes(authMiddleware: AuthMiddleware[F, AdminUser]): HttpRoutes[F] = Router(
     prefixPath -> authMiddleware(httpRoutes)
   )
 }

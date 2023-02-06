@@ -54,7 +54,7 @@ final case class Checkout[F[_]: Background: Logger: MonadThrow: Retry](
     bgAction(action)
   }
 
-  def ensureNonEmpty[A](xs: List[A]): F[NonEmptyList[A]] =
+  private def ensureNonEmpty[A](xs: List[A]): F[NonEmptyList[A]] =
     MonadThrow[F].fromOption(NonEmptyList.fromList(xs), EmptyCartError)
 
   def process(userId: UserId, card: Card): F[OrderId] =

@@ -4,11 +4,12 @@ import shop.domain.brand._
 import shop.domain.ID
 import shop.effects.GenUUID
 import shop.sql.codecs._
-
 import skunk._
 import cats.effect._
 import cats.syntax.all._
 import skunk.implicits._
+
+import java.util.UUID
 trait Brands[F[_]] {
   def findAll: F[List[Brand]]
   def create(name: BrandName): F[BrandId]
