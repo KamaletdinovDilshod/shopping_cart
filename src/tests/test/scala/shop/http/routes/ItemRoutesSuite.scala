@@ -17,7 +17,7 @@ import shop.suite.HttpSuite
 object ItemRoutesSuite extends HttpSuite {
 
   def dataItems(items: List[Item]) = new TestItems {
-    override def findAll: IO[List[Item]] = IO.pure(items)
+    override def findAll: IO[List[Item]]                  = IO.pure(items)
     override def findBy(brand: BrandName): IO[List[Item]] =
       IO.pure(items.find(_.brand.name === brand).toList)
   }
@@ -36,24 +36,23 @@ object ItemRoutesSuite extends HttpSuite {
       b <- brandGen
     } yield i -> b
 
-    forall(gen) {
-      case (it, b) =>
-        val req = GET(uri"/items".withQueryParam("brand", b.name.value))
-        val routes   = new ItemRoutes[IO](dataItems(it)).routes
-        val expected = it.find(_.brand.name === b.name).toList
-        expectHttpBodyAndStatus(routes, req)(expected, Status.Ok)
+    forall(gen) { case (it, b) =>
+      val req      = GET(uri"/items".withQueryParam("brand", b.name.value))
+      val routes   = new ItemRoutes[IO](dataItems(it)).routes
+      val expected = it.find(_.brand.name === b.name).toList
+      expectHttpBodyAndStatus(routes, req)(expected, Status.Ok)
     }
   }
 }
 
 protected class TestItems extends Items[IO] {
-  def findAll: F[List[Item]] = ???
+  def findAll: F[List[Item]] = List.empty().pure[IO]
 
-  def findBy(brand: BrandName): F[List[Item]] = ???
+  def findBy(brand: BrandName): F[List[Item]] = IO.pure(List.empty)
 
-  def findById(itemId: ItemId): F[Option[Item]] = ???
+  def findById(itemId: ItemId): F[Option[Item]] = IO.pure(List.empty)(None)
 
-  def create(item: CreateItem): F[ItemId] = ???
+  def create(item: CreateItem): F[ItemId] = IO.randomUUID
 
-  def update(item: UpdateItem): F[Unit] = ???
+  def update(item: UpdateItem): F[Unit] = IO.unit
 }
